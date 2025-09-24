@@ -9,14 +9,23 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepare": "husky"
   },
   "dependencies": {
+    "eslint": "^9.36.0",
+    "prettier": "^3.6.2",
     "vue": "^3.5.18"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
+    "husky": "^9.1.7",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0"
+  },
+  "lint-staged": {
+    ".js": "eslint --cache --fix",
+    ".css": "stylelint --fix",
+    "*.{ts,json}": "prettier --write"
   }
 }
