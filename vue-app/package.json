@@ -10,7 +10,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/"
   },
   "dependencies": {
     "eslint": "^9.36.0",
@@ -18,14 +22,30 @@
     "vue": "^3.5.18"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/eslint-parser": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@eslint/js": "^9.36.0",
+    "@tailwindcss/postcss": "^4.1.13",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "autoprefixer": "^10.4.21",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.5.0",
     "husky": "^9.1.7",
+    "lint-staged": "^16.2.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.13",
     "vite": "^7.0.6",
     "vite-plugin-vue-devtools": "^8.0.0"
   },
   "lint-staged": {
-    ".js": "eslint --cache --fix",
-    ".css": "stylelint --fix",
-    "*.{ts,json}": "prettier --write"
+    "*.{vue,js,jsx,cjs,mjs}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{css,scss,sass,html,md,json}": [
+      "prettier --write"
+    ]
   }
 }

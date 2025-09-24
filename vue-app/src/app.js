@@ -1,1 +1,1 @@
-    console.log("App created")
+console.log('App created')
