@@ -1,9 +1,27 @@
-<script setup></script>
+<script setup>
+import ThreeCanvas from './components/ThreeCanvas.vue'
+</script>
 
 <template>
-  <div class="p-6">
-    <h1 class="text-8xl font-extrabold text-red-600">Testowy nagłówek</h1>
+  <div class="app">
+    <h1>Three.js Canvas</h1>
+    <ThreeCanvas />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+app {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+h1 {
+  color: #333;
+  font-size: 28px;
+}
+</style>
