@@ -22,6 +22,6 @@ app {
 
 h1 {
   color: #333;
-  font-size: 28px;
+  font-size: 27px;
 }
 </style>
