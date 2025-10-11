@@ -64,7 +64,7 @@ const initThree = () => {
 .three-canvas {
   width: 100%;
   height: 60vh;
-  border-radius: 8px;
+  border-radius: 9px;
   overflow: hidden;
 }
 </style>
