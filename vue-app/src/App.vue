@@ -10,7 +10,7 @@ import ThreeCanvas from './components/ThreeCanvas.vue'
 </template>
 
 <style scoped>
-app {
+.app {
   width: 100%;
   min-height: 100vh;
   padding: 20px;
