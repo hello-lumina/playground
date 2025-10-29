@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import CounterButton from './components/CounterButton.vue'
 import ColorBox from './components/ColorBox.vue'
 import ChildPing from './components/ChildPing.vue'
+import UIButton from './components/UIButton.vue'
 
 const currentColor = ref('red')
 const pingMessage = ref('Czekam ping')
@@ -10,9 +11,11 @@ const pingMessage = ref('Czekam ping')
 function getRandomColor() {
   return '#' + Math.floor(Math.random() * 16777215).toString(16)
 }
+
 function toggleColor() {
   currentColor.value = getRandomColor()
 }
+
 function handlePing() {
   pingMessage.value = 'Otrzymalem pinga'
 }
@@ -29,7 +32,7 @@ function handlePing() {
 
       <div class="block">
         <ColorBox :color="currentColor" />
-        <button class="btn" @click="toggleColor">Zmień kolor</button>
+        <UIButton @click="toggleColor"> Zmień kolor </UIButton>
       </div>
 
       <div class="block">
@@ -56,26 +59,11 @@ function handlePing() {
   display: flex;
   justify-content: center;
   gap: 50px;
+  flex-wrap: wrap;
 }
 
 .block {
   text-align: center;
-}
-
-.btn {
-  margin-top: 15px;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  background-color: #42b983;
-  color: white;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn:hover {
-  background-color: #2c9d6d;
 }
 
 .ping-msg {

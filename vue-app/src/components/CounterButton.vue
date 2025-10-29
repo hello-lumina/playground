@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import UIButton from './UIButton.vue'
 
 const count = ref(0)
 
@@ -10,8 +11,10 @@ function increment() {
 
 <template>
   <div class="counter">
-    <button @click="increment">Click</button>
-    Kliknięcia: <strong>{{ count }}</strong>
+    <UIButton @click="increment">Click</UIButton>
+    <p>
+      Kliknięcia: <strong>{{ count }}</strong>
+    </p>
   </div>
 </template>
 
@@ -20,22 +23,9 @@ function increment() {
   margin: 10px 0;
 }
 
-button {
-  padding: 10px 16px;
-  background-color: #42b983;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-button:hover {
-  background-color: #2c9d6d;
-}
-
 p {
   margin-top: 10px;
   font-size: 14px;
+  color: #444;
 }
 </style>
