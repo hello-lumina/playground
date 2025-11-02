@@ -1,17 +1,11 @@
 <script setup>
 import ThreeCanvas from './components/ThreeCanvas.vue'
 import UIParagraph from './components/UIParagraph.vue'
+import ShaderScene from './components/ShaderScene.vue'
 </script>
 
 <template>
-  <div class="app">
-    <div class="canvas-wrapper">
-      <div class="text-overlay">
-        <UIParagraph text="Kliknij obiekt, aby zmienić kolor" type="h5" />
-      </div>
-      <ThreeCanvas />
-    </div>
-  </div>
+  <ShaderScene />
 </template>
 
 <style scoped>
