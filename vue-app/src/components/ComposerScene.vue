@@ -245,7 +245,6 @@ h1 {
 }
 
 .info {
-  background: rgba(55, 65, 81, 0.8);
   color: #d1d5db;
   padding: 12px;
   border-radius: 6px;

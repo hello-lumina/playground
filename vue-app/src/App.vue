@@ -3,10 +3,11 @@ import ThreeCanvas from './components/ThreeCanvas.vue'
 import UIParagraph from './components/UIParagraph.vue'
 import ShaderScene from './components/ShaderScene.vue'
 import ComposerScene from "@/components/ComposerScene.vue";
+import ModelScene from "@/components/ModelScene.vue"
 </script>
 
 <template>
-  <ComposerScene />
+  <ModelScene />
 </template>
 
 <style scoped>
