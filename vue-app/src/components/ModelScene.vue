@@ -70,7 +70,7 @@ function initScene() {
   controls.dampingFactor = 0.05
 
   // Podłoga
-  const floorGeometry = new THREE.PlaneGeometry(5, 5)
+  const floorGeometry = new THREE.PlaneGeometry(6, 6)
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0x222222,
     roughness: 0.8,
