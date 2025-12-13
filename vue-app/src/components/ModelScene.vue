@@ -7,6 +7,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import UILoadingBar from './UILoadingBar.vue'
+import UIParagraph from './UIParagraph.vue'
 
 const canvasRef = ref(null)
 const effectsEnabled = ref(true)
@@ -16,10 +17,17 @@ const progress = ref(0)
 const lightIntensity = ref(2)
 const shadowsEnabled = ref(true)
 const showCube = ref(true)
+const animationDuration = ref(0.7)
+const isAnimating = ref(false)
 
-let scene, camera, renderer, model, floor, cube, clock, controls
+let scene, camera, renderer, model, floor, cube, clock, controls, raycaster, mouse
 let composer, bloomPass, directionalLight
 let animationId
+
+// Stan animacji
+let animationStartTime = 0
+let originalCubePosition = null
+let originalCubeRotation = null
 
 onMounted(() => {
   initScene()
@@ -31,14 +39,15 @@ onUnmounted(() => {
   if (animationId) cancelAnimationFrame(animationId)
   if (renderer) renderer.dispose()
   if (controls) controls.dispose()
+  if (canvasRef.value) {
+    canvasRef.value.removeEventListener('click', onCanvasClick)
+  }
 })
 
 function initScene() {
-  // Scene
   scene = new THREE.Scene()
   scene.background = new THREE.Color(0x000000)
 
-  // Camera
   camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -47,7 +56,6 @@ function initScene() {
   )
   camera.position.set(3, 3, 5)
 
-  // Renderer z cieniami
   renderer = new THREE.WebGLRenderer({
     canvas: canvasRef.value,
     antialias: true
@@ -57,13 +65,12 @@ function initScene() {
   renderer.shadowMap.enabled = true
   renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-  // OrbitControls
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
   controls.dampingFactor = 0.05
 
   // Podłoga
-  const floorGeometry = new THREE.PlaneGeometry(10, 10)
+  const floorGeometry = new THREE.PlaneGeometry(5, 5)
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0x222222,
     roughness: 0.8,
@@ -75,7 +82,7 @@ function initScene() {
   floor.receiveShadow = true
   scene.add(floor)
 
-  // Cube z ComposerScene (zielony z emissive)
+
   const cubeGeometry = new THREE.BoxGeometry(1, 1, 1)
   const cubeMaterial = new THREE.MeshStandardMaterial({
     color: 0x00ff88,
@@ -83,7 +90,7 @@ function initScene() {
     emissiveIntensity: 0.8
   })
   cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-  cube.position.set(0, 1, 0)
+  cube.position.set(0, 0.5, 0)
   cube.castShadow = true
   cube.receiveShadow = true
   scene.add(cube)
@@ -121,7 +128,86 @@ function initScene() {
 
   clock = new THREE.Clock()
 
+  // Raycaster
+  raycaster = new THREE.Raycaster()
+  mouse = new THREE.Vector2()
+  canvasRef.value.addEventListener('click', onCanvasClick)
+
   window.addEventListener('resize', onResize)
+}
+
+function onCanvasClick(event) {
+  if (isAnimating.value || !cube) {
+    console.log('Ignoruję kliknięcie - animacja w trakcie')
+    return
+  }
+
+  const rect = canvasRef.value.getBoundingClientRect()
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+
+  raycaster.setFromCamera(mouse, camera)
+
+  const intersects = raycaster.intersectObject(cube)
+
+  if (intersects.length > 0) {
+    console.log('Kliknięto cube! Uruchamiam animację')
+    startCubeAnimation()
+  } else {
+    console.log('Kliknięto poza cube')
+  }
+}
+
+function startCubeAnimation() {
+  isAnimating.value = true
+  animationStartTime = clock.getElapsedTime()
+
+  originalCubePosition = {
+    x: cube.position.x,
+    y: cube.position.y,
+    z: cube.position.z
+  }
+  originalCubeRotation = {
+    x: cube.rotation.x,
+    y: cube.rotation.y,
+    z: cube.rotation.z
+  }
+
+  console.log('Animacja startuje z pozycji:', originalCubePosition)
+}
+
+function updateCubeAnimation() {
+  if (!isAnimating.value || !cube) return
+
+  const elapsed = clock.getElapsedTime() - animationStartTime
+  const duration = animationDuration.value
+  const progress = elapsed / duration
+
+  if (progress >= 1) {
+
+    cube.position.set(
+        originalCubePosition.x,
+        originalCubePosition.y,
+        originalCubePosition.z
+    )
+    cube.rotation.set(
+        originalCubeRotation.x,
+        originalCubeRotation.y,
+        originalCubeRotation.z
+    )
+    isAnimating.value = false
+    console.log('Animacja zakończona')
+    return
+  }
+
+
+  const jumpHeight = 2
+  const jump = Math.sin(progress * Math.PI) * jumpHeight
+  cube.position.y = originalCubePosition.y + jump
+
+
+  const rotationAmount = Math.PI * 2
+  cube.rotation.y = originalCubeRotation.y + (progress * rotationAmount)
 }
 
 function loadModel() {
@@ -167,6 +253,7 @@ function loadModel() {
         model.position.z = 0
 
         scene.add(model)
+        console.log('Model załadowany')
       },
       (xhr) => {
         if (xhr.lengthComputable) {
@@ -184,13 +271,10 @@ function animate() {
 
   const elapsed = clock.getElapsedTime()
 
-  // Obracaj cube (jak w ComposerScene)
-  if (cube && showCube.value) {
-    cube.rotation.x = elapsed * 0.3
-    cube.rotation.y = elapsed * 0.5
-  }
 
-  // Obracaj model
+  updateCubeAnimation()
+
+  // Obracaj TYLKO model (duck), cube jest statyczny
   if (model) {
     model.rotation.y = elapsed * 0.3
   }
@@ -254,7 +338,11 @@ watch(showCube, (visible) => {
     <UILoadingBar v-if="isLoading" :progress="progress" />
 
     <div class="controls" v-if="!isLoading">
-      <h1>Model 3D + Cube z cieniami</h1>
+      <h1>Model 3D + Cube + Animacja</h1>
+
+      <UIParagraph variant="h5">
+        Kliknij zielony cube, żeby zobaczyć animację podskoku
+      </UIParagraph>
 
       <div class="controls-row">
         <label class="checkbox-label">
@@ -295,13 +383,27 @@ watch(showCube, (visible) => {
           >
         </div>
 
+        <div class="slider-control">
+          <label>Czas animacji: {{ animationDuration.toFixed(1) }}s</label>
+          <input
+              type="range"
+              v-model.number="animationDuration"
+              min="0.3"
+              max="1.5"
+              step="0.1"
+          >
+        </div>
+
         <div class="status">
-          {{ effectsEnabled ? '✓ Kompozytor' : '✓ Direct' }} | {{ shadowsEnabled ? '✓ Cienie' : '✗ Bez cieni' }}
+          {{ effectsEnabled ? '✓ Kompozytor' : '✓ Direct' }} |
+          {{ shadowsEnabled ? '✓ Cienie' : '✗ Bez cieni' }} |
+          {{ isAnimating ? '🎬 Animacja' : '✓ Gotowy' }}
         </div>
       </div>
 
       <div class="info">
-
+        Cube jest statyczny - kliknij w niego aby uruchomić animację podskoku i obrotu.
+        W czasie animacji kolejne kliknięcia są ignorowane.
       </div>
     </div>
 
@@ -321,6 +423,7 @@ canvas {
   display: block;
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 
 .controls {
@@ -332,13 +435,14 @@ canvas {
   padding: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   z-index: 10;
+  pointer-events: auto;
 }
 
 h1 {
   color: white;
   font-size: 24px;
   font-weight: bold;
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
 }
 
 .controls-row {
